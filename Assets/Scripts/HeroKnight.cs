@@ -25,6 +25,10 @@ public class HeroKnight : MonoBehaviour {
     private float               m_delayToIdle = 0.0f;
     private float               m_rollDuration = 8.0f / 14.0f;
     private float               m_rollCurrentTime;
+    
+    public float                attackRange = 0.5f;
+    public LayerMask            enemyLayers;
+    public Transform            m_hitBox;
 
 
     // Use this for initialization
@@ -109,21 +113,7 @@ public class HeroKnight : MonoBehaviour {
         //Attack
         else if(Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
         {
-            m_currentAttack++;
-
-            // Loop back to one after third attack
-            if (m_currentAttack > 3)
-                m_currentAttack = 1;
-
-            // Reset Attack combo if time since last attack is too large
-            if (m_timeSinceAttack > 1.0f)
-                m_currentAttack = 1;
-
-            // Call one of three attack animations "Attack1", "Attack2", "Attack3"
-            m_animator.SetTrigger("Attack" + m_currentAttack);
-
-            // Reset timer
-            m_timeSinceAttack = 0.0f;
+            Attack();
         }
 
         // Block
@@ -191,5 +181,38 @@ public class HeroKnight : MonoBehaviour {
             // Turn arrow in correct direction
             dust.transform.localScale = new Vector3(m_facingDirection, 1, 1);
         }
+    }
+
+    void Attack()
+    {
+        m_currentAttack++;
+
+        // Loop back to one after third attack
+        if (m_currentAttack > 3)
+            m_currentAttack = 1;
+
+        // Reset Attack combo if time since last attack is too large
+        if (m_timeSinceAttack > 1.0f)
+            m_currentAttack = 1;
+
+        // Call one of three attack animations "Attack1", "Attack2", "Attack3"
+        m_animator.SetTrigger("Attack" + m_currentAttack);
+
+        // Reset timer
+        m_timeSinceAttack = 0.0f;
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(m_hitBox.position, attackRange, enemyLayers);
+
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            Debug.Log("We hit " + enemy.name);
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (m_hitBox == null)
+            return;
+
+        Gizmos.DrawWireSphere(m_hitBox.position, attackRange);
     }
 }
