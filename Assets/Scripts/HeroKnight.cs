@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class HeroKnight : MonoBehaviour {
 
@@ -22,7 +23,9 @@ public class HeroKnight : MonoBehaviour {
     private float               m_rollCurrentTime;
     private float               attackRate = 3f;
     private float               nextAttackTime = 0f;
-    
+    private bool                isBlocking = false;
+    private Vector3             originalScale;
+
     public float                attackRange = 0.5f;
     public LayerMask            enemyLayers;
     public Transform            m_hitBox;
@@ -38,11 +41,13 @@ public class HeroKnight : MonoBehaviour {
         m_body2d = GetComponent<Rigidbody2D>();
         m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_HeroKnight>();
         currentHealth = maxHealth;
+        originalScale = transform.localScale;
     }
 
     // Update is called once per frame
     void Update ()
     {
+
         // Increase timer that controls attack combo
         m_timeSinceAttack += Time.deltaTime;
 
@@ -74,18 +79,18 @@ public class HeroKnight : MonoBehaviour {
         // Swap direction of sprite depending on walk direction
         if (inputX > 0)
         {
-            GetComponent<SpriteRenderer>().flipX = false;
+            transform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y, originalScale.z);
             m_facingDirection = 1;
         }
             
         else if (inputX < 0)
         {
-            GetComponent<SpriteRenderer>().flipX = true;
+            transform.localScale = new Vector3(-Mathf.Abs(originalScale.x), originalScale.y, originalScale.z);
             m_facingDirection = -1;
         }
 
         // Move
-        if (!m_rolling )
+        if (!m_rolling && !isBlocking)
             m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);
 
         //Set AirSpeed in animator
@@ -100,12 +105,16 @@ public class HeroKnight : MonoBehaviour {
         // Block
         else if (Input.GetMouseButtonDown(1) && !m_rolling)
         {
-            m_animator.SetTrigger("Block");
             m_animator.SetBool("IdleBlock", true);
+            isBlocking = true;
         }
 
         else if (Input.GetMouseButtonUp(1))
+        {
             m_animator.SetBool("IdleBlock", false);
+            isBlocking = false;
+        }
+
 
         // Roll
         else if (Input.GetKeyDown("left shift") && !m_rolling)
@@ -184,6 +193,11 @@ public class HeroKnight : MonoBehaviour {
 
     public void takeDamage(int damage)
     {
+        if (isBlocking)
+        {
+            Debug.Log("Hero blocked damage!");
+            return;
+        }
         Debug.Log("Hero took damage!");
         currentHealth -= damage;
         m_animator.SetTrigger("Hurt");
