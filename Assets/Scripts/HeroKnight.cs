@@ -33,6 +33,8 @@ public class HeroKnight : MonoBehaviour {
     private int maxHealth = 100;
     public int currentHealth;
 
+    private float minX = -9 , maxX = 9;
+
 
     // Use this for initialization
     void Start ()
@@ -75,6 +77,9 @@ public class HeroKnight : MonoBehaviour {
 
         // -- Handle input and movement --
         float inputX = Input.GetAxis("Horizontal");
+        Vector3 newPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        newPosition.x = Mathf.Clamp(newPosition.x, minX, maxX);
+        transform.position = newPosition;
 
         // Swap direction of sprite depending on walk direction
         if (inputX > 0)
@@ -152,7 +157,6 @@ public class HeroKnight : MonoBehaviour {
                     m_animator.SetInteger("AnimState", 0);
         }
     }
-
 
     void Attack()
     {
