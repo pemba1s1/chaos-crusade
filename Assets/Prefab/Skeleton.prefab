@@ -152,7 +152,6 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   animator: {fileID: 5091053430350875327}
-  player: {fileID: 6323719953710832613, guid: a4b4a6d32bcb19248a754d6602ffc7e4, type: 3}
   speed: 1
   m_hitBox: {fileID: 3440652444590113349}
   attackRange: 1

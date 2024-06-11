@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
     public Animator animator;
-    public GameObject player;
+    private GameObject player;
     public float speed = 1f;
 
     public Transform m_hitBox;
@@ -23,6 +23,7 @@ public class Enemy : MonoBehaviour
     {
         currentHealth = maxHealth;
         originalScale = transform.localScale;
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<HeroKnight>().gameObject;
     }
 
     // Update is called once per frame
@@ -84,7 +85,9 @@ public class Enemy : MonoBehaviour
         foreach (Collider2D enemy in hitEnemies)
         {
             Debug.Log("We hit " + enemy.name);
-            enemy.GetComponent<HeroKnight>().takeDamage(50);
+            if (!player.activeSelf) return;
+
+            player.GetComponent<HeroKnight>().takeDamage(10);
         }
     }
 
