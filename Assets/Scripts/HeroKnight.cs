@@ -179,12 +179,15 @@ public class HeroKnight : MonoBehaviour {
 
         // Reset timer
         m_timeSinceAttack = 0.0f;
+        nextAttackTime = Time.time + 1f / attackRate;
+    }
+
+    private void findEnemyAndAttack() {
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(m_hitBox.position, attackRange, enemyLayers);
         foreach (Collider2D enemy in hitEnemies)
         {
             enemy.GetComponent<Enemy>().takeDamage(50);
         }
-        nextAttackTime = Time.time + 1f / attackRate;
     }
 
     private void OnDrawGizmosSelected()
